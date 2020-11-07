@@ -6,7 +6,8 @@ console.clear();
 const authenticator = new Authenticator;
 authenticator.login()
   .then(async client => {
-    console.log(await client.account.currentUser());
+    const currentUser = await client.account.currentUser();
+    console.log(`✅  Logged in as: ${chalk.bold.green(currentUser.username)}`);
   })
   .catch(err => console.log(chalk.red(err)));
 

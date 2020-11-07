@@ -42,6 +42,8 @@ export default class Authenticator {
       await ig.state.deserialize(serialized);
       await ig.user.info(ig.state.cookieUserId);
 
+      console.log(chalk.blue('Logging from session...'))
+
       return ig;
     }
 

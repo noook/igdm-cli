@@ -1,13 +1,18 @@
 import chalk from 'chalk';
-import Authenticator from './auth';
+import Authenticator from './domain/auth';
+import DirectMessaging from './domain/direct-messaging';
 
 console.clear();
 
 const authenticator = new Authenticator;
+
 authenticator.login()
   .then(async client => {
     const currentUser = await client.account.currentUser();
     console.log(`✅  Logged in as: ${chalk.bold.green(currentUser.username)}`);
+
+    const dm = new DirectMessaging(client);
+    dm.init();
   })
   .catch(err => console.log(chalk.red(err)));
 

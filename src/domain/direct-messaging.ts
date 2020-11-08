@@ -70,6 +70,7 @@ export default class DirectMessaging {
         'raven_media',
         'reel_share',
         'placeholder',
+        'link',
       ].includes(item_type))
       .forEach(msg => {
         const user = users[msg.user_id];
@@ -82,8 +83,9 @@ export default class DirectMessaging {
         }
         if (!content) {
           console.log(msg);
+        } else { 
+          console.log(`${chalk.bold.blue(user)}:`, MessageFormatter.maxLength(content, 100));
         }
-        console.log(`${chalk.bold.blue(user)}:`, MessageFormatter.maxLength(content, 100));
       });
 
     console.log('\n');

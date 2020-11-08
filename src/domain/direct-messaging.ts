@@ -65,7 +65,7 @@ export default class DirectMessaging {
     users[this.me.pk] = this.me.username;
 
     thread.items
-      .filter(({ item_type }) => item_type !== 'action_log')
+      .filter(({ item_type }) => !['action_log', 'raven_media'].includes(item_type))
       .forEach(msg => {
         const user = users[msg.user_id];
         let content = '';
@@ -75,7 +75,9 @@ export default class DirectMessaging {
         } else {
           content = msg.text!;
         }
-
+        if (!content) {
+          console.log(msg);
+        }
         console.log(`${chalk.bold.blue(user)}:`, MessageFormatter.maxLength(content, 100));
       });
 

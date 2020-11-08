@@ -14,5 +14,10 @@ authenticator.login()
     const dm = new DirectMessaging(client);
     dm.init();
   })
-  .catch(err => console.log(chalk.red(err)));
+  .catch((err: string) => {
+    console.log(chalk.red(err))
+    if (err.toString().includes('login_required')) {
+      authenticator.logout();
+    }
+  });
 

@@ -1,4 +1,4 @@
-import { writeFileSync, readFileSync, existsSync } from 'fs';
+import { writeFileSync, readFileSync, existsSync, rmSync } from 'fs';
 import { resolve } from 'path';
 import { IgApiClient } from 'instagram-private-api';
 import inquirer from 'inquirer';
@@ -75,7 +75,15 @@ export default class Authenticator {
       })
       .then(() => ig)
       .catch(err => {
+        this.logout();
         throw new Error('An error occurred while logging in.');
       });
+  }
+
+  public logout() {
+    if (existsSync(this.sessionPath)) {
+      rmSync(this.sessionPath);
+    }
+    process.exit();
   }
 }

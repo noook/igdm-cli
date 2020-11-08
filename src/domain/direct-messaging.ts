@@ -2,6 +2,7 @@ import { AccountRepositoryCurrentUserResponseUser, DirectInboxFeedResponseThread
 import inquirer from 'inquirer';
 import chalk from 'chalk';
 import MessageFormatter from './message-formatter';
+import Authenticator from './auth';
 
 export default class DirectMessaging {
   private client: IgApiClient;
@@ -109,6 +110,7 @@ export default class DirectMessaging {
         this.threads = await this.getInbox();
         return this.goToThread(thread.thread_id)
       case '\\q': process.exit();
+      case '\\logout': return new Authenticator().logout()
     }
 
     const { item_id, timestamp } = await this.client.entity.directThread(thread.thread_id).broadcastText(input) as DirectThreadRepositoryBroadcastResponsePayload;

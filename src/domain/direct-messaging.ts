@@ -1,6 +1,7 @@
 import { AccountRepositoryCurrentUserResponseUser, DirectInboxFeedResponseThreadsItem, DirectThreadRepositoryBroadcastResponsePayload, IgApiClient } from 'instagram-private-api';
 import inquirer from 'inquirer';
 import chalk from 'chalk';
+import MessageFormatter from './message-formatter';
 
 export default class DirectMessaging {
   private client: IgApiClient;
@@ -18,6 +19,7 @@ export default class DirectMessaging {
 
   public async init() {
     this.threads = await this.getInbox();
+    console.clear();
     const choices = this.threads.map(({ thread_id, thread_title, last_permanent_item }) => ({
       name: `${thread_title}: ${last_permanent_item.text}`,
       value: thread_id
@@ -45,7 +47,8 @@ export default class DirectMessaging {
       return this.init();
     }
 
-    thread.items.sort((a, b) => +a.timestamp - +b.timestamp);
+    thread.items
+      .sort((a, b) => +a.timestamp - +b.timestamp);
 
     this.printScreen(thread);
   }
@@ -61,9 +64,21 @@ export default class DirectMessaging {
 
     users[this.me.pk] = this.me.username;
 
-    thread.items.forEach(msg => {
-      console.log(`${chalk.bold.blue(users[msg.user_id])}: ${msg.text}`);
-    });
+    thread.items
+      .filter(({ item_type }) => item_type !== 'action_log')
+      .forEach(msg => {
+        const user = users[msg.user_id];
+        let content = '';
+        if (msg.item_type === 'media') {
+          const imgLink = (msg as unknown as DirectInboxFeedResponseThreadsItem & { media: any }).media.image_versions2.candidates[0].url;
+          content = `[image](${imgLink})`;
+        } else {
+          content = msg.text!;
+        }
+
+        console.log(`${chalk.bold.blue(user)}:`, MessageFormatter.maxLength(content, 100));
+      });
+
     console.log('\n');
 
     this.prompt(thread);

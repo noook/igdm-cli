@@ -65,7 +65,12 @@ export default class DirectMessaging {
     users[this.me.pk] = this.me.username;
 
     thread.items
-      .filter(({ item_type }) => !['action_log', 'raven_media'].includes(item_type))
+      .filter(({ item_type }) => ![
+        'action_log',
+        'raven_media',
+        'reel_share',
+        'placeholder',
+      ].includes(item_type))
       .forEach(msg => {
         const user = users[msg.user_id];
         let content = '';
@@ -95,6 +100,14 @@ export default class DirectMessaging {
         prefix: '',
       },
     ]);
+
+    switch (input) {
+      case '\\l': return this.init();
+      case '\\r':
+        this.threads = await this.getInbox();
+        return this.goToThread(thread.thread_id)
+      case '\\q': process.exit();
+    }
 
     const { item_id, timestamp } = await this.client.entity.directThread(thread.thread_id).broadcastText(input) as DirectThreadRepositoryBroadcastResponsePayload;
     thread.items.push({

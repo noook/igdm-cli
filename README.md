@@ -2,6 +2,10 @@
 
 Send and receive Instagram direct message through CLI.
 
+![Conversation listing](./screenshots/listing.png)
+
+![Conversation reading](./screenshots/conversation.png)
+
 ## Installation
 
 Clone this repository and install dependencies with

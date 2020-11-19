@@ -1,4 +1,4 @@
-import { writeFileSync, readFileSync, existsSync, rmSync } from 'fs';
+import { writeFileSync, readFileSync, existsSync, rmSync, mkdirSync} from 'fs';
 import { resolve } from 'path';
 import { IgApiClient } from 'instagram-private-api';
 import inquirer from 'inquirer';
@@ -7,9 +7,12 @@ import chalk from 'chalk';
 const prefix = chalk.blue('?');
 
 export default class Authenticator {
-  private sessionPath: string = resolve(__dirname, '..', 'session', 'session.json')
+  private sessionFolder: string = process.env.NODE_ENV === 'production' ? resolve(__dirname, 'session') : resolve(__dirname, '..', 'session')
+  private sessionPath: string = resolve(this.sessionFolder, 'session.json')
 
   private saveSession(data: object) {
+    if (!existsSync(this.sessionFolder))
+      mkdirSync(this.sessionFolder)
     writeFileSync(this.sessionPath, JSON.stringify(data));
   }
 
@@ -74,7 +77,7 @@ export default class Authenticator {
         return ig.account.login(answers.username, answers.password)
       })
       .then(() => ig)
-      .catch(err => {
+      .catch(() => {
         this.logout();
         throw new Error('An error occurred while logging in.');
       });

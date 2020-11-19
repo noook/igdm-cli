@@ -2,25 +2,50 @@
   "name": "igdm",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
-  "scripts": {
-    "start": "ts-node ./src/index.ts",
-    "dev": "nodemon --inspect --no-stdin"
-  },
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "main": "dist/index.js",
+  "bin": {
+    "igdm-cli": "dist/index.js"
+  },
+  "files": [
+    "bin/",
+    "src/"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "cross-env NODE_ENV=production webpack --config ./webpack.config.js --progress --color",
+    "start": "babel-node --extensions '.ts' ./src/index.ts",
+    "lint": "eslint . --ignore-path .gitignore --ext .ts,.js",
+    "tscheck": "tsc"
+  },
   "devDependencies": {
+    "@babel/cli": "^7.12.1",
+    "@babel/core": "^7.12.3",
+    "@babel/node": "^7.12.6",
+    "@babel/preset-env": "^7.12.1",
+    "@babel/preset-typescript": "^7.12.1",
     "@types/inquirer": "^7.3.1",
     "@typescript-eslint/eslint-plugin": "^4.6.1",
     "@typescript-eslint/parser": "^4.6.1",
+    "babel-loader": "^8.2.1",
+    "babel-plugin-module-resolver": "^4.0.0",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "cross-env": "^7.0.2",
     "eslint": "^7.13.0",
     "eslint-config-airbnb-typescript": "^12.0.0",
     "nodemon": "^2.0.6",
     "ts-node": "^9.0.0",
-    "typescript": "^4.0.5"
+    "typescript": "^4.0.5",
+    "webpack": "^5.5.1",
+    "webpack-cli": "^4.2.0",
+    "webpack-node-externals": "^2.5.2"
   },
   "dependencies": {
+    "babel-polyfill": "6.26.0",
     "chalk": "^4.1.0",
     "dotenv": "^8.2.0",
     "inquirer": "^7.3.3",

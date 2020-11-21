@@ -1,6 +1,7 @@
 import { DirectInboxFeedResponseItemsItem } from "instagram-private-api";
 import chalk from 'chalk';
-import { LinkMessage, RavenMediaMessage } from "types/messages";
+import { BaseRavenMediaMessage, LinkMessage } from "types/messages";
+import { getRavenMediaType, isRavenExpired, isRavenMessage, isSentRaven } from "./raven-message";
 
 type Formatter = (msg: DirectInboxFeedResponseItemsItem) => string;
 export default class MessageFormatter {
@@ -20,6 +21,7 @@ export default class MessageFormatter {
     try {
       return this.formatterMap[msg.item_type](msg);
     } catch (e) {
+      console.log(e);
       return chalk.bold.red(`${user} send message of type: ${msg.item_type}`);
     }
   }
@@ -64,22 +66,30 @@ export default class MessageFormatter {
     ].join('\n');
   }
   
-  /**
-   * Only works for unopened medias for now
-   * @todo Handle different states (opened, replayed)
-   */
   private ravenFormatter(msg: DirectInboxFeedResponseItemsItem): string {
-    const media = msg as unknown as RavenMediaMessage;
+    const media = msg as unknown as BaseRavenMediaMessage;
     const user = this.users[msg.user_id];
-    const img = media.visual_media.media.image_versions2.candidates
-    .sort((a, b) => {
-      if (a.width < b.width) return -1;
-      if (a.width > b.width) return 1;
-      return 0;
-    })[0];
-    if (!img) {
-      `${chalk.bold.blue(user)}: [Ephemeral picture]${chalk.bold.red('(NO URL)')}`;
+    if (isSentRaven(media)) {
+      return `${chalk.bold.blue(user)}: ${chalk.green('You sent a ' + getRavenMediaType(media))}`;
     }
-    return `${chalk.bold.blue(user)}: [Ephemeral picture](${img.url})`;
+    if (isRavenExpired(media)) {
+      return `${chalk.bold.blue(user)}: ${chalk.green('Sent a ' + getRavenMediaType(media) + ' (expired)')}`;
+    }
+    if (isRavenMessage(media)) {
+      const img = media.visual_media.media.image_versions2.candidates
+        .sort((a, b) => {
+            if (a.width < b.width) return -1;
+            if (a.width > b.width) return 1;
+            return 0;
+          })[0];
+
+      if (!img) {
+        return `${chalk.bold.blue(user)}: [Ephemeral picture]${chalk.bold.red('(no url)')}`;
+      }
+
+      return `${chalk.bold.blue(user)}: [Ephemeral picture](${img.url})`;
+    }
+  
+    return `${chalk.bold.blue(user)}: ${chalk.green('[Ephemeral picture](unhandled type)')}`;
   }
 }

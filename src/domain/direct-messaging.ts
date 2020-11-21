@@ -8,6 +8,7 @@ export default class DirectMessaging {
   private client: IgApiClient;
   private threads: DirectInboxFeedResponseThreadsItem[] = [];
   private me!: AccountRepositoryCurrentUserResponseUser;
+  private formatter = new MessageFormatter();
 
   public constructor(client: IgApiClient) {
     this.client = client;
@@ -54,7 +55,7 @@ export default class DirectMessaging {
     this.printScreen(thread);
   }
 
-  private printScreen(thread: DirectInboxFeedResponseThreadsItem) {
+  private async printScreen(thread: DirectInboxFeedResponseThreadsItem) {
     console.clear();
     console.log(chalk.yellow.bold(`Messages with: ${thread.thread_title}\n`));
 
@@ -62,32 +63,16 @@ export default class DirectMessaging {
       ...acc,
       [value.pk]: value.username,
     }), {});
-
+    
     users[this.me.pk] = this.me.username;
 
-    thread.items
-      .filter(({ item_type }) => ![
-        'action_log',
-        'raven_media',
-        'reel_share',
-        'placeholder',
-        'link',
-      ].includes(item_type))
-      .forEach(msg => {
-        const user = users[msg.user_id];
-        let content = '';
-        if (msg.item_type === 'media') {
-          const imgLink = (msg as unknown as DirectInboxFeedResponseThreadsItem & { media: any }).media.image_versions2.candidates[0].url;
-          content = `[image](${imgLink})`;
-        } else {
-          content = msg.text!;
-        }
-        if (!content) {
-          console.log(msg);
-        } else { 
-          console.log(`${chalk.bold.blue(user)}:`, MessageFormatter.maxLength(content, 100));
-        }
-      });
+    this.formatter.setUsers(users);
+
+    for (let i = 0; i < thread.items.length; i += 1) {
+      const msg = thread.items[i];
+      const content = await this.formatter.format(msg);
+      console.log(content);
+    }
 
     console.log('\n');
 

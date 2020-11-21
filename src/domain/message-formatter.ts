@@ -24,7 +24,7 @@ export default class MessageFormatter {
     try {
       return this.formatterMap[msg.item_type](msg);
     } catch (e) {
-      return chalk.bold.red(`${user} send message of type: ${msg.item_type}`);
+      return chalk.bold.red(`${user} sent message of type: ${msg.item_type}`);
     }
   }
 
@@ -74,25 +74,24 @@ export default class MessageFormatter {
     if (isSentRaven(media)) {
       return `${chalk.bold.blue(user)}: ${chalk.green('You sent a ' + getRavenMediaType(media))}`;
     }
+    if (isRavenMessage(media)) {
+      const img = media.visual_media.media.image_versions2.candidates
+        .find(({ width }) => width === media.visual_media.media.original_width) || media.visual_media.media.image_versions2.candidates[0];
+
+      if (!img) {
+        return `${chalk.bold.blue(user)}: ${chalk.red('[Ephemeral picture]')}${chalk.bold.red('(no url)')}`;
+      }
+
+      const mediaAppearance = chalk.green(`[Ephemeral picture](${img.url})`)
+
+      return `${chalk.bold.blue(user)}: ${mediaAppearance}`;
+    }
+
     if (isRavenExpired(media)) {
       return `${chalk.bold.blue(user)}: ${chalk.green('Sent a ' + getRavenMediaType(media) + ' (expired)')}`;
     }
-    if (isRavenMessage(media)) {
-      const img = media.visual_media.media.image_versions2.candidates
-        .sort((a, b) => {
-            if (a.width < b.width) return -1;
-            if (a.width > b.width) return 1;
-            return 0;
-          })[0];
-
-      if (!img) {
-        return `${chalk.bold.blue(user)}: [Ephemeral picture]${chalk.bold.red('(no url)')}`;
-      }
-
-      return `${chalk.bold.blue(user)}: [Ephemeral picture](${img.url})`;
-    }
   
-    return `${chalk.bold.blue(user)}: ${chalk.green('[Ephemeral picture](unhandled type)')}`;
+    return `${chalk.bold.blue(user)}: ${chalk.red('[Ephemeral picture](unhandled type)')}`;
   }
 
   private mediaFormatter(msg: DirectInboxFeedResponseItemsItem): string {
@@ -100,11 +99,7 @@ export default class MessageFormatter {
     const media = msg as MediaMessage;
 
     const img = media.media.image_versions2.candidates
-      .sort((a, b) => {
-          if (a.width < b.width) return -1;
-          if (a.width > b.width) return 1;
-          return 0;
-        })[0];
+      .find(({ width }) => width === media.media.original_width) || media.media.image_versions2.candidates[0];
 
     if (!img) {
       return `${chalk.bold.blue(user)}: [Media]${chalk.bold.red('(no url)')}`;

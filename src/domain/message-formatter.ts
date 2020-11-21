@@ -1,6 +1,6 @@
 import { DirectInboxFeedResponseItemsItem } from "instagram-private-api";
 import chalk from 'chalk';
-import { BaseRavenMediaMessage, LinkMessage } from "types/messages";
+import { BaseRavenMediaMessage, LinkMessage, MediaMessage, MediaShareMessage, PlaceholderMessage } from "types/messages";
 import { getRavenMediaType, isRavenExpired, isRavenMessage, isSentRaven } from "./raven-message";
 
 type Formatter = (msg: DirectInboxFeedResponseItemsItem) => string;
@@ -9,6 +9,9 @@ export default class MessageFormatter {
     text: (msg) => this.textFormatter(msg),
     raven_media: (msg) => this.ravenFormatter(msg),
     link: (msg) => this.linkFormatter(msg),
+    media: (msg) => this.mediaFormatter(msg),
+    media_share: (msg) => this.mediaShareFormatter(msg),
+    placeholder: (msg) => this.placeholderFormatter(msg),
   };
   private users: Record<number, string> = {};
 
@@ -21,7 +24,6 @@ export default class MessageFormatter {
     try {
       return this.formatterMap[msg.item_type](msg);
     } catch (e) {
-      console.log(e);
       return chalk.bold.red(`${user} send message of type: ${msg.item_type}`);
     }
   }
@@ -57,7 +59,7 @@ export default class MessageFormatter {
 
   private linkFormatter(msg: DirectInboxFeedResponseItemsItem): string {
     const user = this.users[msg.user_id];
-    const link = msg as unknown as LinkMessage;
+    const link = msg as LinkMessage;
     return [
       `${chalk.bold.blue(user)}: ${this.maxLength(link.link.text, 100)}`,
       chalk.green.bold('[LINK]'),
@@ -91,5 +93,39 @@ export default class MessageFormatter {
     }
   
     return `${chalk.bold.blue(user)}: ${chalk.green('[Ephemeral picture](unhandled type)')}`;
+  }
+
+  private mediaFormatter(msg: DirectInboxFeedResponseItemsItem): string {
+    const user = this.users[msg.user_id];
+    const media = msg as MediaMessage;
+
+    const img = media.media.image_versions2.candidates
+      .sort((a, b) => {
+          if (a.width < b.width) return -1;
+          if (a.width > b.width) return 1;
+          return 0;
+        })[0];
+
+    if (!img) {
+      return `${chalk.bold.blue(user)}: [Media]${chalk.bold.red('(no url)')}`;
+    }
+    const mediaAppearance = chalk.green(`[Media](${img.url})`);
+    return `${chalk.bold.blue(user)}: ${mediaAppearance}`;
+  }
+
+  private mediaShareFormatter(msg: DirectInboxFeedResponseItemsItem): string {
+    const user = this.users[msg.user_id];
+    const media = msg as MediaShareMessage;
+    const mediaAppearance = chalk.magenta(`@${media.media_share.user.username}`);
+    return [
+      `${chalk.bold.blue(user)}: Shared a media by ${mediaAppearance}`,
+      chalk.yellow('Media share can\'t be seen from a terminal.'),
+    ].join('\n');
+  }
+
+  private placeholderFormatter(msg: DirectInboxFeedResponseItemsItem): string {
+    const user = this.users[msg.user_id];
+    const mediaAppearance = chalk.red('Non displayable placeholder');
+    return `${chalk.bold.blue(user)}: ${mediaAppearance}`;
   }
 }

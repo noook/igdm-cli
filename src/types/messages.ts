@@ -1,3 +1,5 @@
+import { UserFeedResponseItemsItem } from "instagram-private-api";
+
 type MediaTypePicture = 1;
 type MediaTypeVideo = 2;
 
@@ -8,6 +10,23 @@ interface ExpiringMediaActionSummary {
   type: ExpiredMediaType;
   timestamp: string;
   count: number;
+}
+
+interface ImageCandidate {
+  width: number;
+  height: number;
+  url: string;
+  scans_profile: string;
+  estimated_scans_sizes: number[];
+}
+
+type Media = {
+  id: string;
+  image_versions2: {
+    candidates: ImageCandidate[]
+  }
+  original_width: number;
+  original_height: number;
 }
 
 interface BaseMessage {
@@ -36,19 +55,7 @@ export type RavenMediaMessage = BaseRavenMediaMessage & {
   visual_media: {
     url_expire_at_secs: number;
     playback_duration_secs: number;
-    media: {
-      id: string;
-      image_versions2: {
-        candidates: {
-          width: number;
-          height: number;
-          url: string;
-          scans_profile: string;
-          estimated_scans_sizes: number[];
-        }[]
-      }
-      original_width: number;
-      original_height: number;
+    media: Media & {
       media_id: string;
       organic_tracking_token: string;
     }
@@ -94,4 +101,26 @@ export type LinkMessage = BaseMessage & {
     mutation_token: string;
   };
   show_forward_attribution: boolean;
+}
+
+export type MediaMessage = BaseMessage & {
+  item_type: 'media';
+  media: Media & {
+    media_type: MediaTypePicture | MediaTypeVideo;
+  };
+  show_forward_attribution: boolean;
+}
+
+export type MediaShareMessage = BaseMessage & {
+  item_type: 'media_share';
+  media_share: UserFeedResponseItemsItem;
+}
+
+export type PlaceholderMessage = BaseMessage & {
+  item_type: 'placeholder';
+  placeholder: {
+    is_linked: boolean;
+    title: string;
+    message: string;
+  };
 }

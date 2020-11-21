@@ -8,25 +8,22 @@ Send and receive Instagram direct message through CLI.
 
 ## Installation
 
-Clone this repository and install dependencies with
 ```sh
-git clone git@github.com:noook/igdm-cli.git && cd igdm-cli
-
-npm install
+$ npm install -g igdm
 ```
 
 ## Usage
 
-Start the script with:
+Start the app with:
 ```sh
-npm start
+$ igdm
 ```
 
 You will be prompted your credentials only for your first connection, on subsequent script starts
 it will load your credentials from a session file.
 
 After being logged in, the list of the 20 latest conversations will appear, select a conversation
-with arrow keys and select it by pressing `enter` key. Type a message and press enter to send it.
+with arrow keys and select it by pressing <kbd>Enter</kbd> key. Type a message and press <kbd>Enter</kbd> to send it.
 
 ## Commands
 

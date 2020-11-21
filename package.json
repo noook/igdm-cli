@@ -1,8 +1,12 @@
 {
   "name": "igdm",
-  "version": "1.1.0",
+  "version": "1.0.0",
   "description": "Send and receive Instagram direct message through CLI.",
-  "keywords": ["instagram", "cli", "messaging"],
+  "keywords": [
+    "instagram",
+    "cli",
+    "messaging"
+  ],
   "author": {
     "email": "me@neilrichter.com",
     "name": "Neil Richter",
@@ -19,13 +23,16 @@
     "igdm": "dist/index.js"
   },
   "files": [
-    "bin/",
-    "src/"
+    "dist/",
+    "scripts/",
+    "screenshots/",
+    "session.json"
   ],
   "publishConfig": {
     "access": "public"
   },
   "scripts": {
+    "postinstall": "node ./scripts/postinstall.js",
     "build": "cross-env NODE_ENV=production webpack --config ./webpack.config.js --progress --color",
     "start": "babel-node --extensions '.ts' ./src/index.ts",
     "lint": "eslint . --ignore-path .gitignore --ext .ts,.js",

@@ -1,6 +1,6 @@
 import { DirectInboxFeedResponseItemsItem } from "instagram-private-api";
 import chalk from 'chalk';
-import { BaseRavenMediaMessage, LinkMessage, MediaMessage, MediaShareMessage, PlaceholderMessage } from "types/messages";
+import { BaseRavenMediaMessage, LinkMessage, MediaMessage, MediaShareMessage } from "types/messages";
 import { getRavenMediaType, isRavenExpired, isRavenMessage, isSentRaven } from "./raven-message";
 
 type Formatter = (msg: DirectInboxFeedResponseItemsItem) => string;

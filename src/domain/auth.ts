@@ -1,4 +1,4 @@
-import { writeFileSync, readFileSync, existsSync, rmSync, mkdirSync} from 'fs';
+import { writeFileSync, readFileSync } from 'fs';
 import { resolve } from 'path';
 import { IgApiClient } from 'instagram-private-api';
 import inquirer from 'inquirer';
@@ -7,17 +7,15 @@ import chalk from 'chalk';
 const prefix = chalk.blue('?');
 
 export default class Authenticator {
-  private sessionFolder: string = process.env.NODE_ENV === 'production' ? resolve(__dirname, 'session') : resolve(__dirname, '..', 'session')
-  private sessionPath: string = resolve(this.sessionFolder, 'session.json')
+  private sessionPath: string = resolve(process.mainModule!.path, '..', 'session.json')
 
   private saveSession(data: object) {
-    if (!existsSync(this.sessionFolder))
-      mkdirSync(this.sessionFolder)
     writeFileSync(this.sessionPath, JSON.stringify(data));
   }
 
   private get sessionExists(): boolean {
-    if (!existsSync(this.sessionPath)) return false;
+    const session = readFileSync(this.sessionPath, { encoding: 'utf-8' });
+    if (JSON.stringify(session) === '"{}"') return false;
 
     const cookies: { cookies: { key: string }[] } = JSON.parse(this.loadSession().cookies);
 
@@ -31,15 +29,12 @@ export default class Authenticator {
 
   public async login(): Promise<IgApiClient> {
     const ig = new IgApiClient();
-    console.log()
 
     if (this.sessionExists) {
       const session = this.loadSession();
-      const username = JSON.parse(session.cookies).cookies.find(({ key }: { key: string}) => key === 'ds_user').value;
+      const username = JSON.parse(session.cookies).cookies.find(({ key }: { key: string }) => key === 'ds_user').value;
       ig.state.generateDevice(username);
-    }
 
-    if (this.sessionExists) {
       await ig.simulate.preLoginFlow();
       const serialized = this.loadSession();
       await ig.state.deserialize(serialized);
@@ -84,9 +79,7 @@ export default class Authenticator {
   }
 
   public logout() {
-    if (existsSync(this.sessionPath)) {
-      rmSync(this.sessionPath);
-    }
+    writeFileSync(this.sessionPath, '{}');
     process.exit();
   }
 }

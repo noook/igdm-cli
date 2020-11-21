@@ -64,6 +64,10 @@ export default class MessageFormatter {
     ].join('\n');
   }
   
+  /**
+   * Only works for unopened medias for now
+   * @todo Handle different states (opened, replayed)
+   */
   private ravenFormatter(msg: DirectInboxFeedResponseItemsItem): string {
     const media = msg as unknown as RavenMediaMessage;
     const user = this.users[msg.user_id];

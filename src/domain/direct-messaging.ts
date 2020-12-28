@@ -23,7 +23,7 @@ export default class DirectMessaging {
     this.threads = await this.getInbox();
     console.clear();
     const choices = this.threads.map(({ thread_id, thread_title, last_permanent_item }) => ({
-      name: `${thread_title}: ${last_permanent_item.text}`,
+      name: `${thread_title}: ${last_permanent_item ? last_permanent_item.text : 'Latest message can\'t be displayed.' }`,
       value: thread_id
     }));
 

@@ -22,8 +22,9 @@ export default class DirectMessaging {
   public async init() {
     this.threads = await this.getInbox();
     console.clear();
+    const placeholder = chalk.red('No preview available');
     const choices = this.threads.map(({ thread_id, thread_title, last_permanent_item }) => ({
-      name: `${thread_title}: ${last_permanent_item ? last_permanent_item.text : 'Latest message can\'t be displayed.' }`,
+      name: `${thread_title}: ${last_permanent_item ? last_permanent_item.text : placeholder }`,
       value: thread_id
     }));
 

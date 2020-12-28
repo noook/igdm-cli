@@ -1,6 +1,10 @@
 {
   "name": "igdm",
+<<<<<<< HEAD
   "version": "1.2.1",
+=======
+  "version": "1.3.1",
+>>>>>>> 2877136d7aaa7d045a0a30f74e0bd236fd70113c
   "description": "Send and receive Instagram direct message through CLI.",
   "keywords": [
     "instagram",

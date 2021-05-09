@@ -7,7 +7,7 @@ import chalk from 'chalk';
 const prefix = chalk.blue('?');
 
 export default class Authenticator {
-  private sessionPath: string = resolve(process.mainModule!.path, '..', 'session.json')
+  private sessionPath: string = resolve(require.main!.path, '..', 'session.json')
 
   private saveSession(data: object) {
     writeFileSync(this.sessionPath, JSON.stringify(data));
@@ -15,7 +15,7 @@ export default class Authenticator {
 
   private get sessionExists(): boolean {
     const session = readFileSync(this.sessionPath, { encoding: 'utf-8' });
-    if (JSON.stringify(session) === '"{}"') return false;
+    if (session === '{}') return false;
 
     const cookies: { cookies: { key: string }[] } = JSON.parse(this.loadSession().cookies);
 
@@ -73,8 +73,10 @@ export default class Authenticator {
       })
       .then(() => ig)
       .catch(() => {
+        const error = chalk.red.bold('An error occurred while logging in. Check your credentials or your network connectivity.');
+        console.error(error);
         this.logout();
-        throw new Error('An error occurred while logging in.');
+        throw new Error(error)
       });
   }
 

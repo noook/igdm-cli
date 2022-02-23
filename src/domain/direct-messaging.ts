@@ -90,7 +90,7 @@ export default class DirectMessaging {
       },
     ]);
 
-    switch (input) {
+    switch ((input as string).toLowerCase()) {
       case '\\l': return this.init();
       case '\\r':
         this.threads = await this.getInbox();

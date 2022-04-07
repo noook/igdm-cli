@@ -56,7 +56,7 @@ interface BaseMessage {
   user_id: number;
   item_type: string;
   client_context: string;
-  is_ssh_mode: null | boolean;
+  is_shh_mode: null | boolean;
 }
 
 export type { Video };

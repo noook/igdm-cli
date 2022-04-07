@@ -82,7 +82,7 @@ export default class MessageFormatter {
         ?.sort((a: Video, b: Video) => (a.height < b.height) ? 1 : -1)
         ?.shift();
 
-      if (!img && !media) {
+      if (!img && !video) {
         return `${chalk.bold.blue(user)}: ${chalk.red('[Ephemeral media]')}${chalk.bold.red('(no url)')}`;
       }
 

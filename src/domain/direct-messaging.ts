@@ -24,7 +24,7 @@ export default class DirectMessaging {
     console.clear();
     const placeholder = chalk.red('No preview available');
     const choices = this.threads.map(({ thread_id, thread_title, last_permanent_item }) => ({
-      name: `${thread_title}: ${last_permanent_item ? last_permanent_item.text : placeholder }`,
+      name: `${thread_title}: ${last_permanent_item.text ? last_permanent_item.text : placeholder }`,
       value: thread_id
     }));
 

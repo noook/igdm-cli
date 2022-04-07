@@ -1,6 +1,6 @@
 import { DirectInboxFeedResponseItemsItem } from "instagram-private-api";
 import chalk from 'chalk';
-import { BaseRavenMediaMessage, LinkMessage, MediaMessage, MediaShareMessage } from "types/messages";
+import { BaseRavenMediaMessage, LinkMessage, MediaMessage, MediaShareMessage, Video } from "types/messages";
 import { getRavenMediaType, isRavenExpired, isRavenMessage, isSentRaven } from "./raven-message";
 
 type Formatter = (msg: DirectInboxFeedResponseItemsItem) => string;
@@ -78,11 +78,23 @@ export default class MessageFormatter {
       const img = media.visual_media.media.image_versions2.candidates
         .find(({ width }) => width === media.visual_media.media.original_width) || media.visual_media.media.image_versions2.candidates[0];
 
-      if (!img) {
-        return `${chalk.bold.blue(user)}: ${chalk.red('[Ephemeral picture]')}${chalk.bold.red('(no url)')}`;
+      const video = media.visual_media.media?.video_versions
+        ?.sort((a: Video, b: Video) => (a.height < b.height) ? 1 : -1)
+        ?.shift();
+
+      if (!img && !media) {
+        return `${chalk.bold.blue(user)}: ${chalk.red('[Ephemeral media]')}${chalk.bold.red('(no url)')}`;
       }
 
-      const mediaAppearance = chalk.green(`[Ephemeral picture](${img.url})`)
+      let mediaAppearance = '';
+
+      if (img) {
+        mediaAppearance += chalk.green(`[Ephemeral image](${img.url})`);
+      }
+
+      if (video) {
+        mediaAppearance += chalk.magenta(`[Ephemeral video](${video.url})`);
+      }
 
       return `${chalk.bold.blue(user)}: ${mediaAppearance}`;
     }
@@ -91,7 +103,7 @@ export default class MessageFormatter {
       return `${chalk.bold.blue(user)}: ${chalk.green('Sent a ' + getRavenMediaType(media) + ' (expired)')}`;
     }
   
-    return `${chalk.bold.blue(user)}: ${chalk.red('[Ephemeral picture](unhandled type)')}`;
+    return `${chalk.bold.blue(user)}: ${chalk.red('[Ephemeral media](unhandled type)')}`;
   }
 
   private mediaFormatter(msg: DirectInboxFeedResponseItemsItem): string {

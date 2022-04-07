@@ -2,6 +2,7 @@ import { UserFeedResponseItemsItem } from "instagram-private-api";
 
 type MediaTypePicture = 1;
 type MediaTypeVideo = 2;
+type MediaTypeAudio = 11;
 
 type ReplyType = 'expiring_media_message' | string;
 type ExpiredMediaType = 'raven_opened' | string;
@@ -29,14 +30,24 @@ interface Video {
   url_expiration_timestamp_us: string;
 }
 
+interface Audio {
+  audio_src: string;
+  duration: number;
+  waveform_data: number[];
+  waveform_sampling_frequency_hz: number;
+  fallback: any;
+  audio_src_expiration_timestamp_us: string;
+}
+
 type Media = {
   id: string;
-  image_versions2: {
-    candidates: ImageCandidate[]
+  image_versions2?: {
+    candidates: ImageCandidate[];
   }
   video_versions?: Video[]
-  original_width: number;
-  original_height: number;
+  audio?: Audio;
+  original_width?: number;
+  original_height?: number;
 }
 
 interface BaseMessage {
@@ -119,6 +130,21 @@ export type MediaMessage = BaseMessage & {
   item_type: 'media';
   media: Media & {
     media_type: MediaTypePicture | MediaTypeVideo;
+  };
+  show_forward_attribution: boolean;
+}
+
+export type VoiceMessage = BaseMessage & {
+  item_type: 'voice_media';
+  voice_media: {
+    media: Media & {
+      media_type: MediaTypeAudio;
+    };
+    seen_count: number;
+    is_shh_mode: boolean;
+    seen_user_ids: string[];
+    replay_expiring_at_us: string | null;
+    view_mode: ViewMode;
   };
   show_forward_attribution: boolean;
 }

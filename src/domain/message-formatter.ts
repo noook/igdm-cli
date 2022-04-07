@@ -1,6 +1,6 @@
 import { DirectInboxFeedResponseItemsItem } from "instagram-private-api";
 import chalk from 'chalk';
-import { BaseRavenMediaMessage, LinkMessage, MediaMessage, MediaShareMessage, Video, VoiceMessage } from "types/messages";
+import { AnimationMessage, BaseRavenMediaMessage, LinkMessage, MediaMessage, MediaShareMessage, Video, VoiceMessage } from "types/messages";
 import { getRavenMediaType, isRavenExpired, isRavenMessage, isSentRaven } from "./raven-message";
 
 type Formatter = (msg: DirectInboxFeedResponseItemsItem) => string;
@@ -11,6 +11,7 @@ export default class MessageFormatter {
     link: (msg) => this.linkFormatter(msg),
     media: (msg) => this.mediaFormatter(msg),
     voice_media: (msg) => this.voiceFormatter(msg),
+    animated_media: (msg) => this.animationFormatter(msg),
     media_share: (msg) => this.mediaShareFormatter(msg),
     placeholder: (msg) => this.placeholderFormatter(msg),
   };
@@ -138,6 +139,19 @@ export default class MessageFormatter {
       return `${chalk.bold.blue(user)}: ${chalk.red('[Voice]')}${chalk.bold.red('(no url)')}`;
     }
     const mediaAppearance = chalk.green(`[Voice](${audio})`);
+    return `${chalk.bold.blue(user)}: ${mediaAppearance}`;
+  }
+
+  private animationFormatter(msg: DirectInboxFeedResponseItemsItem): string {
+    const user = this.users[msg.user_id];
+    const media = msg as AnimationMessage;
+
+    const animation = media.animated_media.images.fixed_height.url;
+
+    if (!animation) {
+      return `${chalk.bold.blue(user)}: ${chalk.red('[Animation]')}${chalk.bold.red('(no url)')}`;
+    }
+    const mediaAppearance = chalk.green(`[Animation](${animation})`);
     return `${chalk.bold.blue(user)}: ${mediaAppearance}`;
   }
 

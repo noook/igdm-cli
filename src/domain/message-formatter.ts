@@ -78,7 +78,6 @@ export default class MessageFormatter {
     if (isRavenMessage(media)) {
       const img = media.visual_media.media.image_versions2?.candidates
         .find(({ width }) => width === media.visual_media.media.original_width) || media.visual_media.media.image_versions2?.candidates[0];
-
       const video = media.visual_media.media?.video_versions
         ?.sort((a: Video, b: Video) => (a.height < b.height) ? 1 : -1)
         ?.shift();
@@ -88,15 +87,12 @@ export default class MessageFormatter {
       }
 
       let mediaAppearance = '';
-
       if (img) {
         mediaAppearance += chalk.green(`[Ephemeral image](${img.url})`);
       }
-
       if (video) {
         mediaAppearance += chalk.magenta(`[Ephemeral video](${video.url})`);
       }
-
       return `${chalk.bold.blue(user)}: ${mediaAppearance}`;
     }
 
@@ -113,11 +109,21 @@ export default class MessageFormatter {
 
     const img = media.media.image_versions2?.candidates
       .find(({ width }) => width === media.media.original_width) || media.media.image_versions2?.candidates[0];
+    const video = media.media?.video_versions
+      ?.sort((a: Video, b: Video) => (a.height < b.height) ? 1 : -1)
+      ?.shift();
 
-    if (!img) {
-      return `${chalk.bold.blue(user)}: [Media]${chalk.bold.red('(no url)')}`;
+    if (!img && !video) {
+      return `${chalk.bold.blue(user)}: ${chalk.red('[Media]')}${chalk.bold.red('(no url)')}`;
     }
-    const mediaAppearance = chalk.green(`[Media](${img.url})`);
+
+    let mediaAppearance = '';
+    if (img) {
+      mediaAppearance += chalk.green(`[Media image](${img.url})`);
+    }
+    if (video) {
+      mediaAppearance += chalk.magenta(`[Media video](${video.url})`);
+    }
     return `${chalk.bold.blue(user)}: ${mediaAppearance}`;
   }
 

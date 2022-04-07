@@ -149,6 +149,18 @@ export type VoiceMessage = BaseMessage & {
   show_forward_attribution: boolean;
 }
 
+export type AnimationMessage = BaseMessage & {
+  item_type: 'animated_media';
+  animated_media: {
+    images: {
+      fixed_height: {
+        url: string;
+      }
+    }
+  };
+  show_forward_attribution: boolean;
+}
+
 export type MediaShareMessage = BaseMessage & {
   item_type: 'media_share';
   media_share: UserFeedResponseItemsItem;

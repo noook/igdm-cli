@@ -17,7 +17,16 @@ interface ImageCandidate {
   height: number;
   url: string;
   scans_profile: string;
-  estimated_scans_sizes: number[];
+  estimated_scans_sizes?: number[];
+}
+
+interface Video {
+  height: number;
+  width: number;
+  url: string;
+  type: number;
+  fallback: any;
+  url_expiration_timestamp_us: string;
 }
 
 type Media = {
@@ -25,6 +34,7 @@ type Media = {
   image_versions2: {
     candidates: ImageCandidate[]
   }
+  video_versions?: Video[]
   original_width: number;
   original_height: number;
 }
@@ -37,6 +47,8 @@ interface BaseMessage {
   client_context: string;
   is_ssh_mode: null | boolean;
 }
+
+export type { Video };
 
 export type BaseRavenMediaMessage = BaseMessage & {
   item_type: 'raven_media';

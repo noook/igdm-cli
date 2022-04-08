@@ -91,7 +91,7 @@ export default class MessageFormatter {
         .find(({ width }) => width === media.visual_media.media.original_width) || media.visual_media.media.image_versions2?.candidates[0];
       const video = media.visual_media.media?.video_versions
         ?.sort((a: Video, b: Video) => (a.height < b.height) ? 1 : -1)
-        ?.shift();
+        .shift();
 
       if (!img && !video) {
         return `${chalk.bold.blue(user)}: ${chalk.red('[Ephemeral media]')}${chalk.bold.red('(no url)')}`;
@@ -122,7 +122,7 @@ export default class MessageFormatter {
       .find(({ width }) => width === media.media.original_width) || media.media.image_versions2?.candidates[0];
     const video = media.media?.video_versions
       ?.sort((a: Video, b: Video) => (a.height < b.height) ? 1 : -1)
-      ?.shift();
+      .shift();
 
     if (!img && !video) {
       return `${chalk.bold.blue(user)}: ${chalk.red('[Media]')}${chalk.bold.red('(no url)')}`;

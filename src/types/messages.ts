@@ -161,6 +161,15 @@ export type AnimationMessage = BaseMessage & {
   show_forward_attribution: boolean;
 }
 
+export type ActionMessage = BaseMessage & {
+  item_type: 'action_log';
+  action_log: {
+    description: string;
+    is_reaction_log: boolean;
+  };
+  is_sent_by_viewer: boolean;
+}
+
 export type MediaShareMessage = BaseMessage & {
   item_type: 'media_share';
   media_share: UserFeedResponseItemsItem;

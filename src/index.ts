@@ -1,3 +1,5 @@
+import 'core-js/stable';
+import 'regenerator-runtime/runtime';
 import chalk from 'chalk';
 import Authenticator from './domain/auth';
 import DirectMessaging from './domain/direct-messaging';
@@ -20,4 +22,3 @@ authenticator.login()
       authenticator.logout();
     }
   });
-

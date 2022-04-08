@@ -1,12 +1,13 @@
 import { DirectInboxFeedResponseItemsItem } from "instagram-private-api";
 import chalk from 'chalk';
-import { AnimationMessage, BaseRavenMediaMessage, LinkMessage, MediaMessage, MediaShareMessage, Video, VoiceMessage } from "types/messages";
+import { ActionMessage, AnimationMessage, BaseRavenMediaMessage, LinkMessage, MediaMessage, MediaShareMessage, Video, VoiceMessage } from "types/messages";
 import { getRavenMediaType, isRavenExpired, isRavenMessage, isSentRaven } from "./raven-message";
 
 type Formatter = (msg: DirectInboxFeedResponseItemsItem) => string;
 export default class MessageFormatter {
   private formatterMap: Record<string, Formatter> = {
     text: (msg) => this.textFormatter(msg),
+    action_log: (msg) => this.actionFormatter(msg),
     raven_media: (msg) => this.ravenFormatter(msg),
     link: (msg) => this.linkFormatter(msg),
     media: (msg) => this.mediaFormatter(msg),
@@ -57,6 +58,15 @@ export default class MessageFormatter {
   private textFormatter(msg: DirectInboxFeedResponseItemsItem): string {
     const user = this.users[msg.user_id];
     return `${chalk.bold.blue(user)}: ${this.maxLength(msg.text!, 100)}`;
+  }
+
+  private actionFormatter(msg: DirectInboxFeedResponseItemsItem): string {
+    const user = this.users[msg.user_id];
+    const action = msg as ActionMessage;
+    if (!action?.action_log?.description) {
+      throw Error('unsupported action_log');
+    }
+    return chalk.bold.blue(`${user} ${action.action_log.description.toLowerCase()}`);
   }
 
   private linkFormatter(msg: DirectInboxFeedResponseItemsItem): string {

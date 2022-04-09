@@ -25,9 +25,6 @@ interface Video {
   height: number;
   width: number;
   url: string;
-  type: number;
-  fallback: any;
-  url_expiration_timestamp_us: string;
 }
 
 interface Audio {
@@ -160,6 +157,15 @@ export type AnimationMessage = BaseMessage & {
   };
   show_forward_attribution: boolean;
 }
+
+export type FelixShareMessage = BaseMessage & {
+  item_type: 'felix_share';
+  felix_share: {
+    video: Media & {
+      media_type: MediaTypePicture | MediaTypeVideo;
+    };
+  }
+};
 
 export type ActionMessage = BaseMessage & {
   item_type: 'action_log';

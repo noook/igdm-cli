@@ -171,11 +171,24 @@ export default class MessageFormatter {
   private mediaShareFormatter(msg: DirectInboxFeedResponseItemsItem): string {
     const user = this.users[msg.user_id];
     const media = msg as MediaShareMessage;
-    const mediaAppearance = chalk.magenta(`@${media.media_share.user.username}`);
-    return [
-      `${chalk.bold.blue(user)}: Shared a media by ${mediaAppearance}`,
-      chalk.yellow('Media share can\'t be seen from a terminal.'),
-    ].join('\n');
+    // TODO: add support for media_share.carousel_media
+    const img = media.media_share.image_versions2?.candidates
+      .find(({ width }) => width === media.media_share.original_width) || media.media_share.image_versions2?.candidates[0];
+    const video = media.media_share?.video_versions
+      ?.sort((a: Video, b: Video) => (a.height < b.height) ? 1 : -1)
+      .shift();
+    if (!img && !video) {
+      return `${chalk.bold.blue(user)}: ${chalk.red('[Media share]')}${chalk.bold.red('(no url)')}`;
+    }
+    const username = chalk.magenta(`@${media.media_share.user.username}`);
+    let mediaAppearance = `[Media share by ${username}]`;
+    if (img) {
+      mediaAppearance += chalk.green(`[Media image](${img.url})`);
+    }
+    if (video) {
+      mediaAppearance += chalk.magenta(`[Media video](${video.url})`);
+    }
+    return `${chalk.bold.blue(user)}: ${mediaAppearance}`;
   }
 
   private storyShareFormatter(msg: DirectInboxFeedResponseItemsItem): string {

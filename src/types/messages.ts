@@ -158,6 +158,16 @@ export type AnimationMessage = BaseMessage & {
   show_forward_attribution: boolean;
 }
 
+export type ReelShareMessage = BaseMessage & {
+  item_type: 'reel_share';
+  reel_share: {
+    text: string;
+    media: Media & {
+      media_type: MediaTypePicture | MediaTypeVideo;
+    };
+  };
+};
+
 export type FelixShareMessage = BaseMessage & {
   item_type: 'felix_share';
   felix_share: {

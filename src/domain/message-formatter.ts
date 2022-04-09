@@ -1,6 +1,6 @@
 import { DirectInboxFeedResponseItemsItem } from "instagram-private-api";
 import chalk from 'chalk';
-import { ActionMessage, AnimationMessage, BaseRavenMediaMessage, FelixShareMessage, LinkMessage, MediaMessage, MediaShareMessage, ReelShareMessage, Video, VoiceMessage } from "types/messages";
+import { ActionMessage, AnimationMessage, BaseRavenMediaMessage, FelixShareMessage, LinkMessage, MediaMessage, MediaShareMessage, ReelShareMessage, StoryShareMessage, Video, VoiceMessage } from "types/messages";
 import { getRavenMediaType, isRavenExpired, isRavenMessage, isSentRaven } from "./raven-message";
 
 type Formatter = (msg: DirectInboxFeedResponseItemsItem) => string;
@@ -14,6 +14,7 @@ export default class MessageFormatter {
     voice_media: (msg) => this.voiceFormatter(msg),
     animated_media: (msg) => this.animationFormatter(msg),
     media_share: (msg) => this.mediaShareFormatter(msg),
+    story_share: (msg) => this.storyShareFormatter(msg),
     reel_share: (msg) => this.reelShareFormatter(msg),
     felix_share: (msg) => this.felixShareFormatter(msg),
     placeholder: (msg) => this.placeholderFormatter(msg),
@@ -175,6 +176,27 @@ export default class MessageFormatter {
       `${chalk.bold.blue(user)}: Shared a media by ${mediaAppearance}`,
       chalk.yellow('Media share can\'t be seen from a terminal.'),
     ].join('\n');
+  }
+
+  private storyShareFormatter(msg: DirectInboxFeedResponseItemsItem): string {
+    const user = this.users[msg.user_id];
+    const media = msg as StoryShareMessage;
+    const img = media.story_share.media.image_versions2?.candidates
+      .find(({ width }) => width === media.story_share.media.original_width) || media.story_share.media.image_versions2?.candidates[0];
+    const video = media.story_share.media?.video_versions
+      ?.sort((a: Video, b: Video) => (a.height < b.height) ? 1 : -1)
+      .shift();
+    if (!img && !video) {
+      return `${chalk.bold.blue(user)}: ${chalk.red('[Story share]')}${chalk.bold.red('(no url)')}`;
+    }
+    let mediaAppearance = '';
+    if (img) {
+      mediaAppearance += chalk.green(`[Story share image](${img.url})`);
+    }
+    if (video) {
+      mediaAppearance += chalk.magenta(`[Story share video](${video.url})`);
+    }
+    return `${chalk.bold.blue(user)}: ${mediaAppearance}`;
   }
 
   private reelShareFormatter(msg: DirectInboxFeedResponseItemsItem): string {

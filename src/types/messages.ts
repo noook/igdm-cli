@@ -1,5 +1,3 @@
-import { UserFeedResponseItemsItem } from "instagram-private-api";
-
 type MediaTypePicture = 1;
 type MediaTypeVideo = 2;
 type MediaTypeAudio = 11;
@@ -197,8 +195,13 @@ export type ActionMessage = BaseMessage & {
 
 export type MediaShareMessage = BaseMessage & {
   item_type: 'media_share';
-  media_share: UserFeedResponseItemsItem;
-}
+  media_share: Media & {
+    media_type: MediaTypePicture | MediaTypeVideo;
+    user: {
+      username: string;
+    };
+  };
+};
 
 export type PlaceholderMessage = BaseMessage & {
   item_type: 'placeholder';

@@ -1,6 +1,6 @@
 import { DirectInboxFeedResponseItemsItem } from "instagram-private-api";
 import chalk from 'chalk';
-import { ActionMessage, AnimationMessage, BaseRavenMediaMessage, LinkMessage, MediaMessage, MediaShareMessage, Video, VoiceMessage } from "types/messages";
+import { ActionMessage, AnimationMessage, BaseRavenMediaMessage, FelixShareMessage, LinkMessage, MediaMessage, MediaShareMessage, Video, VoiceMessage } from "types/messages";
 import { getRavenMediaType, isRavenExpired, isRavenMessage, isSentRaven } from "./raven-message";
 
 type Formatter = (msg: DirectInboxFeedResponseItemsItem) => string;
@@ -14,6 +14,7 @@ export default class MessageFormatter {
     voice_media: (msg) => this.voiceFormatter(msg),
     animated_media: (msg) => this.animationFormatter(msg),
     media_share: (msg) => this.mediaShareFormatter(msg),
+    felix_share: (msg) => this.felixShareFormatter(msg),
     placeholder: (msg) => this.placeholderFormatter(msg),
   };
   private users: Record<number, string> = {};
@@ -173,6 +174,27 @@ export default class MessageFormatter {
       `${chalk.bold.blue(user)}: Shared a media by ${mediaAppearance}`,
       chalk.yellow('Media share can\'t be seen from a terminal.'),
     ].join('\n');
+  }
+
+  private felixShareFormatter(msg: DirectInboxFeedResponseItemsItem): string {
+    const user = this.users[msg.user_id];
+    const media = msg as FelixShareMessage;
+    const img = media.felix_share.video.image_versions2?.candidates
+      .find(({ width }) => width === media.felix_share.video.original_width) || media.felix_share.video.image_versions2?.candidates[0];
+    const video = media.felix_share.video?.video_versions
+      ?.sort((a: Video, b: Video) => (a.height < b.height) ? 1 : -1)
+      .shift();
+    if (!img && !video) {
+      return `${chalk.bold.blue(user)}: ${chalk.red('[Felix share]')}${chalk.bold.red('(no url)')}`;
+    }
+    let mediaAppearance = '';
+    if (img) {
+      mediaAppearance += chalk.green(`[Felix share image](${img.url})`);
+    }
+    if (video) {
+      mediaAppearance += chalk.magenta(`[Felix share video](${video.url})`);
+    }
+    return `${chalk.bold.blue(user)}: ${mediaAppearance}`;
   }
 
   private placeholderFormatter(msg: DirectInboxFeedResponseItemsItem): string {

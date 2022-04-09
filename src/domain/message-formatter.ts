@@ -1,7 +1,7 @@
-import { DirectInboxFeedResponseItemsItem } from "instagram-private-api";
+import { DirectInboxFeedResponseItemsItem } from 'instagram-private-api';
 import chalk from 'chalk';
-import { ActionMessage, AnimationMessage, BaseRavenMediaMessage, FelixShareMessage, LinkMessage, MediaMessage, MediaShareMessage, ReelShareMessage, StoryShareMessage, Video, VoiceMessage } from "types/messages";
-import { getRavenMediaType, isRavenExpired, isRavenMessage, isSentRaven } from "./raven-message";
+import { ActionMessage, AnimationMessage, BaseRavenMediaMessage, FelixShareMessage, LinkMessage, MediaMessage, MediaShareMessage, ReelShareMessage, StoryShareMessage, Video, VoiceMessage } from 'types/messages';
+import { getRavenMediaType, isRavenExpired, isRavenMessage, isSentRaven } from './raven-message';
 
 type Formatter = (msg: DirectInboxFeedResponseItemsItem) => string;
 export default class MessageFormatter {
@@ -19,6 +19,7 @@ export default class MessageFormatter {
     felix_share: (msg) => this.felixShareFormatter(msg),
     placeholder: (msg) => this.placeholderFormatter(msg),
   };
+
   private users: Record<number, string> = {};
 
   public setUsers(users: Record<number, string>) {
@@ -41,20 +42,18 @@ export default class MessageFormatter {
         return paragraph
           .split(' ')
           .reduce<string[][]>((acc, word) => {
-            const row = acc.pop()!;
-            if (`${row.join(' ')} ${word}`.length < lineLength) {
-              row.push(word);
-              acc.push(row);
-            } else {
-              acc.push(row, [word]);
-            }
-            
-            return acc;
-          }, [[]])
+          const row = acc.pop()!;
+          if (`${row.join(' ')} ${word}`.length < lineLength) {
+            row.push(word);
+            acc.push(row);
+          } else {
+            acc.push(row, [word]);
+          }
+          return acc;
+        }, [[]])
           .map(row => row.join(' '))
           .join('\n');
       });
-
     return chunks.join('\n');
   }
 
@@ -95,11 +94,9 @@ export default class MessageFormatter {
       const video = media.visual_media.media?.video_versions
         ?.sort((a: Video, b: Video) => (a.height < b.height) ? 1 : -1)
         .shift();
-
       if (!img && !video) {
         return `${chalk.bold.blue(user)}: ${chalk.red('[Ephemeral media]')}${chalk.bold.red('(no url)')}`;
       }
-
       let mediaAppearance = '';
       if (img) {
         mediaAppearance += chalk.green(`[Ephemeral image](${img.url})`);
@@ -109,28 +106,23 @@ export default class MessageFormatter {
       }
       return `${chalk.bold.blue(user)}: ${mediaAppearance}`;
     }
-
     if (isRavenExpired(media)) {
       return `${chalk.bold.blue(user)}: ${chalk.green('Sent a ' + getRavenMediaType(media) + ' (expired)')}`;
     }
-  
     return `${chalk.bold.blue(user)}: ${chalk.red('[Ephemeral media](unhandled type)')}`;
   }
 
   private mediaFormatter(msg: DirectInboxFeedResponseItemsItem): string {
     const user = this.users[msg.user_id];
     const media = msg as MediaMessage;
-
     const img = media.media.image_versions2?.candidates
       .find(({ width }) => width === media.media.original_width) || media.media.image_versions2?.candidates[0];
     const video = media.media?.video_versions
       ?.sort((a: Video, b: Video) => (a.height < b.height) ? 1 : -1)
       .shift();
-
     if (!img && !video) {
       return `${chalk.bold.blue(user)}: ${chalk.red('[Media]')}${chalk.bold.red('(no url)')}`;
     }
-
     let mediaAppearance = '';
     if (img) {
       mediaAppearance += chalk.green(`[Media image](${img.url})`);
@@ -144,10 +136,8 @@ export default class MessageFormatter {
   private voiceFormatter(msg: DirectInboxFeedResponseItemsItem): string {
     const user = this.users[msg.user_id];
     const media = msg as VoiceMessage;
-
     const audio = media.voice_media.media.audio?.audio_src
       .replace(/&dl=1$/, '');
-
     if (!audio) {
       return `${chalk.bold.blue(user)}: ${chalk.red('[Voice]')}${chalk.bold.red('(no url)')}`;
     }
@@ -158,9 +148,7 @@ export default class MessageFormatter {
   private animationFormatter(msg: DirectInboxFeedResponseItemsItem): string {
     const user = this.users[msg.user_id];
     const media = msg as AnimationMessage;
-
     const animation = media.animated_media.images.fixed_height.url;
-
     if (!animation) {
       return `${chalk.bold.blue(user)}: ${chalk.red('[Animation]')}${chalk.bold.red('(no url)')}`;
     }

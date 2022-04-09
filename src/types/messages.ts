@@ -38,12 +38,12 @@ type Media = {
   id: string;
   image_versions2?: {
     candidates: ImageCandidate[];
-  }
+  };
   video_versions?: Video[]
   audio?: Audio;
   original_width?: number;
   original_height?: number;
-}
+};
 
 interface BaseMessage {
   item_id: string;
@@ -66,8 +66,8 @@ export type BaseRavenMediaMessage = BaseMessage & {
     view_mode: ViewMode;
     seen_count: number;
     replay_expiring_at_us: string;
-  }
-}
+  };
+};
 
 export type RavenMediaMessage = BaseRavenMediaMessage & {
   visual_media: {
@@ -76,9 +76,9 @@ export type RavenMediaMessage = BaseRavenMediaMessage & {
     media: Media & {
       media_id: string;
       organic_tracking_token: string;
-    }
-  }
-}
+    };
+  };
+};
 
 export type ExpiredRavenMediaMessage = BaseRavenMediaMessage & {
   visual_media: {
@@ -88,14 +88,14 @@ export type ExpiredRavenMediaMessage = BaseRavenMediaMessage & {
       count: number;
     };
   };
-}
+};
 
 export type SentRavenMediaMessage = BaseRavenMediaMessage & {
-    visual_media: {
-      reply_type: ReplyType;
-      expiring_media_action_summary: ExpiringMediaActionSummary;
-    }
-}
+  visual_media: {
+    reply_type: ReplyType;
+    expiring_media_action_summary: ExpiringMediaActionSummary;
+  };
+};
 
 export type LinkMessage = BaseMessage & {
   item_type: 'link';
@@ -119,7 +119,7 @@ export type LinkMessage = BaseMessage & {
     mutation_token: string;
   };
   show_forward_attribution: boolean;
-}
+};
 
 export type MediaMessage = BaseMessage & {
   item_type: 'media';
@@ -127,7 +127,7 @@ export type MediaMessage = BaseMessage & {
     media_type: MediaTypePicture | MediaTypeVideo;
   };
   show_forward_attribution: boolean;
-}
+};
 
 export type VoiceMessage = BaseMessage & {
   item_type: 'voice_media';
@@ -142,7 +142,7 @@ export type VoiceMessage = BaseMessage & {
     view_mode: ViewMode;
   };
   show_forward_attribution: boolean;
-}
+};
 
 export type AnimationMessage = BaseMessage & {
   item_type: 'animated_media';
@@ -150,11 +150,11 @@ export type AnimationMessage = BaseMessage & {
     images: {
       fixed_height: {
         url: string;
-      }
-    }
+      };
+    };
   };
   show_forward_attribution: boolean;
-}
+};
 
 export type StoryShareMessage = BaseMessage & {
   item_type: 'story_share';
@@ -181,7 +181,7 @@ export type FelixShareMessage = BaseMessage & {
     video: Media & {
       media_type: MediaTypePicture | MediaTypeVideo;
     };
-  }
+  };
 };
 
 export type ActionMessage = BaseMessage & {
@@ -191,7 +191,7 @@ export type ActionMessage = BaseMessage & {
     is_reaction_log: boolean;
   };
   is_sent_by_viewer: boolean;
-}
+};
 
 export type MediaShareMessage = BaseMessage & {
   item_type: 'media_share';
@@ -210,4 +210,4 @@ export type PlaceholderMessage = BaseMessage & {
     title: string;
     message: string;
   };
-}
+};

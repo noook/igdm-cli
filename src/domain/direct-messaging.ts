@@ -6,8 +6,11 @@ import Authenticator from './auth';
 
 export default class DirectMessaging {
   private client: IgApiClient;
+
   private threads: DirectInboxFeedResponseThreadsItem[] = [];
+
   private me!: AccountRepositoryCurrentUserResponseUser;
+
   private formatter = new MessageFormatter();
 
   public constructor(client: IgApiClient) {
@@ -25,7 +28,7 @@ export default class DirectMessaging {
     const placeholder = chalk.red('No preview available');
     const choices = this.threads.map(({ thread_id, thread_title, last_permanent_item }) => ({
       name: `${thread_title}: ${last_permanent_item.text ? last_permanent_item.text : placeholder }`,
-      value: thread_id
+      value: thread_id,
     }));
 
     const { thread } = await inquirer.prompt([
@@ -45,7 +48,7 @@ export default class DirectMessaging {
   private async goToThread(threadId: string) {
     const thread = this.threads.find(({ thread_id }) => thread_id === threadId);
     if (!thread) {
-      console.log(chalk.red.bold('Couldn\'t find thread with id ' + threadId))
+      console.log(chalk.red.bold('Couldn\'t find thread with id ' + threadId));
 
       return this.init();
     }
@@ -94,11 +97,12 @@ export default class DirectMessaging {
       case '\\l': return this.init();
       case '\\r':
         this.threads = await this.getInbox();
-        return this.goToThread(thread.thread_id)
+        return this.goToThread(thread.thread_id);
       case '\\q': process.exit();
-      case '\\logout': return new Authenticator().logout()
+      case '\\logout': return new Authenticator().logout();
     }
 
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     const { item_id, timestamp } = await this.client.entity.directThread(thread.thread_id).broadcastText(input) as DirectThreadRepositoryBroadcastResponsePayload;
     thread.items.push({
       item_id,
@@ -106,7 +110,7 @@ export default class DirectMessaging {
       timestamp,
       item_type: 'text',
       text: input,
-    })
+    });
     this.printScreen(thread);
   }
 }

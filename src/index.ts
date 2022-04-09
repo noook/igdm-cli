@@ -17,7 +17,7 @@ authenticator.login()
     dm.init();
   })
   .catch((err: string) => {
-    console.log(chalk.red(err))
+    console.log(chalk.red(err));
     if (err.toString().includes('login_required')) {
       authenticator.logout();
     }

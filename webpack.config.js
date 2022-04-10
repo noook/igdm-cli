@@ -10,7 +10,7 @@ module.exports = {
     errorDetails: true
   },
   externals: [nodeExternals()],
-  entry: ['babel-polyfill', './src/index.ts'],
+  entry: ['./src/index.ts'],
   output: {
     path: path.resolve(__dirname, './dist'),
     filename: 'index.js',

@@ -1,7 +1,6 @@
-import { UserFeedResponseItemsItem } from "instagram-private-api";
-
 type MediaTypePicture = 1;
 type MediaTypeVideo = 2;
+type MediaTypeAudio = 11;
 
 type ReplyType = 'expiring_media_message' | string;
 type ExpiredMediaType = 'raven_opened' | string;
@@ -17,17 +16,34 @@ interface ImageCandidate {
   height: number;
   url: string;
   scans_profile: string;
-  estimated_scans_sizes: number[];
+  estimated_scans_sizes?: number[];
+}
+
+interface Video {
+  height: number;
+  width: number;
+  url: string;
+}
+
+interface Audio {
+  audio_src: string;
+  duration: number;
+  waveform_data: number[];
+  waveform_sampling_frequency_hz: number;
+  fallback: any;
+  audio_src_expiration_timestamp_us: string;
 }
 
 type Media = {
   id: string;
-  image_versions2: {
-    candidates: ImageCandidate[]
-  }
-  original_width: number;
-  original_height: number;
-}
+  image_versions2?: {
+    candidates: ImageCandidate[];
+  };
+  video_versions?: Video[]
+  audio?: Audio;
+  original_width?: number;
+  original_height?: number;
+};
 
 interface BaseMessage {
   item_id: string;
@@ -35,8 +51,10 @@ interface BaseMessage {
   user_id: number;
   item_type: string;
   client_context: string;
-  is_ssh_mode: null | boolean;
+  is_shh_mode: null | boolean;
 }
+
+export type { Video };
 
 export type BaseRavenMediaMessage = BaseMessage & {
   item_type: 'raven_media';
@@ -48,8 +66,8 @@ export type BaseRavenMediaMessage = BaseMessage & {
     view_mode: ViewMode;
     seen_count: number;
     replay_expiring_at_us: string;
-  }
-}
+  };
+};
 
 export type RavenMediaMessage = BaseRavenMediaMessage & {
   visual_media: {
@@ -58,9 +76,9 @@ export type RavenMediaMessage = BaseRavenMediaMessage & {
     media: Media & {
       media_id: string;
       organic_tracking_token: string;
-    }
-  }
-}
+    };
+  };
+};
 
 export type ExpiredRavenMediaMessage = BaseRavenMediaMessage & {
   visual_media: {
@@ -70,14 +88,14 @@ export type ExpiredRavenMediaMessage = BaseRavenMediaMessage & {
       count: number;
     };
   };
-}
+};
 
 export type SentRavenMediaMessage = BaseRavenMediaMessage & {
-    visual_media: {
-      reply_type: ReplyType;
-      expiring_media_action_summary: ExpiringMediaActionSummary;
-    }
-}
+  visual_media: {
+    reply_type: ReplyType;
+    expiring_media_action_summary: ExpiringMediaActionSummary;
+  };
+};
 
 export type LinkMessage = BaseMessage & {
   item_type: 'link';
@@ -101,7 +119,7 @@ export type LinkMessage = BaseMessage & {
     mutation_token: string;
   };
   show_forward_attribution: boolean;
-}
+};
 
 export type MediaMessage = BaseMessage & {
   item_type: 'media';
@@ -109,12 +127,81 @@ export type MediaMessage = BaseMessage & {
     media_type: MediaTypePicture | MediaTypeVideo;
   };
   show_forward_attribution: boolean;
-}
+};
+
+export type VoiceMessage = BaseMessage & {
+  item_type: 'voice_media';
+  voice_media: {
+    media: Media & {
+      media_type: MediaTypeAudio;
+    };
+    seen_count: number;
+    is_shh_mode: boolean;
+    seen_user_ids: string[];
+    replay_expiring_at_us: string | null;
+    view_mode: ViewMode;
+  };
+  show_forward_attribution: boolean;
+};
+
+export type AnimationMessage = BaseMessage & {
+  item_type: 'animated_media';
+  animated_media: {
+    images: {
+      fixed_height: {
+        url: string;
+      };
+    };
+  };
+  show_forward_attribution: boolean;
+};
+
+export type StoryShareMessage = BaseMessage & {
+  item_type: 'story_share';
+  story_share: {
+    media: Media & {
+      media_type: MediaTypePicture | MediaTypeVideo;
+    };
+  };
+};
+
+export type ReelShareMessage = BaseMessage & {
+  item_type: 'reel_share';
+  reel_share: {
+    text: string;
+    media: Media & {
+      media_type: MediaTypePicture | MediaTypeVideo;
+    };
+  };
+};
+
+export type FelixShareMessage = BaseMessage & {
+  item_type: 'felix_share';
+  felix_share: {
+    video: Media & {
+      media_type: MediaTypePicture | MediaTypeVideo;
+    };
+  };
+};
+
+export type ActionMessage = BaseMessage & {
+  item_type: 'action_log';
+  action_log: {
+    description: string;
+    is_reaction_log: boolean;
+  };
+  is_sent_by_viewer: boolean;
+};
 
 export type MediaShareMessage = BaseMessage & {
   item_type: 'media_share';
-  media_share: UserFeedResponseItemsItem;
-}
+  media_share: Media & {
+    media_type: MediaTypePicture | MediaTypeVideo;
+    user: {
+      username: string;
+    };
+  };
+};
 
 export type PlaceholderMessage = BaseMessage & {
   item_type: 'placeholder';
@@ -123,4 +210,4 @@ export type PlaceholderMessage = BaseMessage & {
     title: string;
     message: string;
   };
-}
+};

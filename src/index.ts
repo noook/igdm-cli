@@ -1,3 +1,5 @@
+import 'core-js/stable';
+import 'regenerator-runtime/runtime';
 import chalk from 'chalk';
 import Authenticator from './domain/auth';
 import DirectMessaging from './domain/direct-messaging';
@@ -15,9 +17,8 @@ authenticator.login()
     dm.init();
   })
   .catch((err: string) => {
-    console.log(chalk.red(err))
+    console.log(chalk.red(err));
     if (err.toString().includes('login_required')) {
       authenticator.logout();
     }
   });
-

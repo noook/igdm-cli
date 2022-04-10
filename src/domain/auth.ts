@@ -14,7 +14,7 @@ export default class Authenticator {
   }
 
   private get sessionExists(): boolean {
-    const session = readFileSync(this.sessionPath, { encoding: 'utf-8' });
+    const session = readFileSync(this.sessionPath, { encoding: 'utf-8' });
     if (session === '{}') return false;
 
     const cookies: { cookies: { key: string }[] } = JSON.parse(this.loadSession().cookies);
@@ -32,7 +32,7 @@ export default class Authenticator {
 
     if (this.sessionExists) {
       const session = this.loadSession();
-      const username = JSON.parse(session.cookies).cookies.find(({ key }: { key: string }) => key === 'ds_user').value;
+      const username = JSON.parse(session.cookies).cookies.find(({ key }: { key: string }) => key === 'ds_user').value;
       ig.state.generateDevice(username);
 
       await ig.simulate.preLoginFlow();
@@ -40,7 +40,7 @@ export default class Authenticator {
       await ig.state.deserialize(serialized);
       await ig.user.info(ig.state.cookieUserId);
 
-      console.log(chalk.blue('Logging from session...'))
+      console.log(chalk.blue('Logging from session...'));
 
       return ig;
     }
@@ -69,14 +69,14 @@ export default class Authenticator {
           this.saveSession(serialized);
         });
 
-        return ig.account.login(answers.username, answers.password)
+        return ig.account.login(answers.username, answers.password);
       })
       .then(() => ig)
       .catch(() => {
         const error = chalk.red.bold('An error occurred while logging in. Check your credentials or your network connectivity.');
         console.error(error);
         this.logout();
-        throw new Error(error)
+        throw new Error(error);
       });
   }
 

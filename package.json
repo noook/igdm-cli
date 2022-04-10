@@ -1,6 +1,6 @@
 {
   "name": "igdm",
-  "version": "1.4.1-beta",
+  "version": "1.4.2",
   "description": "Send and receive Instagram direct message through CLI.",
   "keywords": [
     "instagram",
@@ -54,7 +54,6 @@
     "eslint": "^8.12.0",
     "eslint-config-airbnb-typescript": "^17.0.0",
     "nodemon": "^2.0.15",
-    "regenerator-runtime": "^0.13.9",
     "ts-node": "^10.7.0",
     "typescript": "^4.6.3",
     "webpack": "^5.72.0",
@@ -67,6 +66,7 @@
     "dotenv": "^16.0.0",
     "inquirer": "^8.2.2",
     "instagram-private-api": "^1.45.3",
+    "regenerator-runtime": "^0.13.9",
     "rxjs": "^7.5.5"
   }
 }

@@ -67,7 +67,7 @@ export default class DirectMessaging {
       ...acc,
       [value.pk]: value.username,
     }), {});
-    
+
     users[this.me.pk] = this.me.username;
 
     this.formatter.setUsers(users);
@@ -95,6 +95,7 @@ export default class DirectMessaging {
 
     switch ((input as string).toLowerCase()) {
       case '\\l': return this.init();
+      case '':
       case '\\r':
         this.threads = await this.getInbox();
         return this.goToThread(thread.thread_id);

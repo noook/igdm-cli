@@ -39,6 +39,6 @@ On the chat screen (conversation listing message), instead of sending messages y
 
 `\l`: Go back to conversation list
 
-`\r`: Refresh the current view and fetch latest messages
+`\r`, (or press <kbd>Enter</kbd> while input is empty): Refresh the current view and fetch latest messages
 
 `\logout`: Logout

@@ -1,8 +1,9 @@
 import { writeFileSync, readFileSync } from 'fs';
 import { resolve } from 'path';
-import { IgApiClient } from 'instagram-private-api';
+import { IgApiClient, IgLoginTwoFactorRequiredError } from 'instagram-private-api';
 import inquirer from 'inquirer';
 import chalk from 'chalk';
+import * as Bluebird from 'bluebird';
 
 const prefix = chalk.blue('?');
 
@@ -69,7 +70,31 @@ export default class Authenticator {
           this.saveSession(serialized);
         });
 
-        return ig.account.login(answers.username, answers.password);
+        return Bluebird.try(() => ig.account.login(answers.username, answers.password)).catch(
+          IgLoginTwoFactorRequiredError,
+          async err => {
+            const {username, totp_two_factor_on, two_factor_identifier} = err.response.body.two_factor_info;
+            // decide which method to use
+            const verificationMethod = totp_two_factor_on ? '0' : '1'; // default to 1 for SMS
+            // At this point a code should have been sent
+            // Get the code
+            const { code } = await inquirer.prompt([
+              {
+                type: 'input',
+                name: 'code',
+                message: `Enter code received via ${verificationMethod === '1' ? 'SMS' : 'TOTP'}`,
+              },
+            ]);
+            // Use the code to finish the login process
+            return ig.account.twoFactorLogin({
+              username,
+              verificationCode: code,
+              twoFactorIdentifier: two_factor_identifier,
+              verificationMethod, // '1' = SMS (default), '0' = TOTP (google auth for example)
+              trustThisDevice: '1', // Can be omitted as '1' is used by default
+            });
+          },
+        ).catch(e => console.error('An error occurred while processing two factor auth', e, e.stack));
       })
       .then(() => ig)
       .catch(() => {
